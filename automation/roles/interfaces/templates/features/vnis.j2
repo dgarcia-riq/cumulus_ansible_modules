@@ -1,0 +1,17 @@
+###############
+# VNIs
+###############
+
+{% for profile in vnis.profiles %}
+{%   for vni in vni_profiles|selectattr('name', 'equalto', profile) %}
+auto vni{{ vni.vxlan_id }}
+iface vni{{ vni.vxlan_id }}
+    bridge-access {{ vni.vlan_id }}
+    bridge-arp-nd-suppress on
+    bridge-learning off
+    mstpctl-bpduguard yes
+    mstpctl-portbpdufilter yes
+    vxlan-id {{ vni.vxlan_id }}
+
+{%   endfor %}
+{% endfor %}

@@ -1,0 +1,20 @@
+
+###############
+# SVI
+###############
+
+{% for profile in vlans.profiles %}
+{%   for vlan in vlan_profiles|selectattr('name', 'equalto', profile) %}
+auto vlan{{ vlan.id }}
+iface vlan{{ vlan.id }}
+{%     for svi in vlan.svis|default([]) %}
+    address {{ svi.ip }}
+{%     endfor %}
+{%     for vrr in vlan.vrrs|default([]) %}
+    address-virtual {{ vrr.mac }} {{ vrr.ip }}
+{%     endfor %}
+    vlan-raw-device bridge
+    vlan-id {{ vlan.id }}
+
+{%   endfor %} 
+{% endfor %}

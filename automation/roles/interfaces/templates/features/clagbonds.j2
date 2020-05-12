@@ -1,0 +1,35 @@
+
+###############
+# Mlag Bonds
+###############
+
+{% for bond in mlag.bonds %}
+{%   set bond_profile = mlag_bond_profiles|selectattr('name', 'equalto', bond.profile)|first %}
+### Bond Profile = {{ bond_profile.name }}
+{%   for port in bond.ports %}
+auto {{ port }}
+iface {{ port }}
+    alias bond member of bond_{{ bond.ports|join('_') }}
+{%   endfor %}
+auto bond_{{ bond.ports|join('_') }}
+iface bond_{{ bond.ports|join('_') }}
+    alias bond profile {{ bond_profile.name }} on {{ bond.ports|join(' and ') }}
+    clag-id {{ bond.id }}
+{%   if bond_profile.bridge_access is defined %}
+    bridge-access {{ bond_profile.bridge_access }}
+{%   endif %}
+{%   if bond_profile.bridge_vids is defined %}
+    bridge-vids {{ bond_profile.bridge_vids|join(' ') }}
+{%   endif %}
+{%   if bond_profile.bridge_pvid is defined %}
+    bridge-pvid {{ bond_profile.bridge_pvid }}
+{%   endif %}
+    bond-slaves {% for port in bond.ports %}{{ port }} {% endfor %}
+
+    mstpctl-bpduguard yes
+    mstpctl-portadminedge yes
+{%   for extra in bond_profile.extras|default([]) %}
+    {{ extra }}
+{%   endfor %}
+
+{% endfor %}

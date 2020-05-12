@@ -1,0 +1,11 @@
+
+###############
+# SWPs
+###############
+
+{% for interface in swps %}
+auto {{ interface.name }}
+iface {{ interface.name }}
+
+
+{% endfor %}

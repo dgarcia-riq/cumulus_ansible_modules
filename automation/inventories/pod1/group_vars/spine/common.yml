@@ -1,0 +1,9 @@
+---
+switch_role: spine
+loopback:
+  ips:
+    - 10.10.10.{{last_octet}}/32
+bgp:
+  fabric: [ swp1, swp2, swp3, swp4, swp5, swp6 ]
+  asn: 65199
+  router_id: 10.10.10.{{last_octet}}

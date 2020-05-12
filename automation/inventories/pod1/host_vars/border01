@@ -1,0 +1,5 @@
+last_octet: 63
+mlag_backup_last_octect: 64
+mlag_priority: primary
+mlag_bonds:
+    - { profile: mlagBondProfileFW, ports: [swp3], id: 1 }

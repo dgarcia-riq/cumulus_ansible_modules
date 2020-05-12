@@ -1,0 +1,7 @@
+last_octet: 3
+mlag_last_octet: 2
+mlag_backup_last_octect: 4
+mlag_priority: primary
+mlag_bonds:
+    - { profile: mlagBondProfileA, ports: [swp1], id: 1 }
+    - { profile: mlagBondProfileB, ports: [swp2], id: 2 }

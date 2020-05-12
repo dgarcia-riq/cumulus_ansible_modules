@@ -1,0 +1,18 @@
+
+###############
+# Loopback
+###############
+
+auto lo
+iface lo inet loopback
+{% for loopback in loopback.ips %}
+    address {{ loopback }}
+{% else %}
+    address 127.0.0.1
+{% endfor %}
+{% if loopback.clag_vxlan_anycast_ip is defined %}
+    clagd-vxlan-anycast-ip {{ loopback.clag_vxlan_anycast_ip }}
+{% endif %}
+{% if loopback.vxlan_local_tunnel_ip is defined %}
+    vxlan-local-tunnelip {{ loopback.vxlan_local_tunnel_ip }}
+{% endif %}
