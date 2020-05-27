@@ -6,3 +6,8 @@
     line: 'UseDNS no'
   notify:
     - restart sshd
+
+- name: Setup a Session Timeout for Inactive Logins
+  copy:
+    content: TMOUT=300
+    dest: /etc/profile.d/session_timeout.sh
