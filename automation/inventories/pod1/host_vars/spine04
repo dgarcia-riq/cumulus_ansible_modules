@@ -1,9 +1,0 @@
-loopback:
-  ips:
-    - 10.10.10.1/32
-  vxlan_local_tunnel_ip: 10.10.10.1
-  clag_vxlan_anycast_ip: 10.1.1.12
-bgp_asn: 65012
-bgp_router_id: 10.10.10.1
-mlag_priority: primary
-mlag_sysmac: 44:38:39:FF:01:12

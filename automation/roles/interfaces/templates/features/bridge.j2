@@ -1,15 +1,32 @@
-
+{% if comments|default(False) %}
 ###############
 # Bridge
 ###############
-
+{{ bridge | default() | to_nice_yaml | comment(prefix='# bridge:', postfix='') -}}
+{% endif %}
 auto bridge
 iface bridge
-    bridge-ports {% if mlag is defined %}peerlink {% endif %}{% if mlag is defined %} \
-                 {% for mlag_bond in mlag.bonds %}bond_{{ mlag_bond.ports|join('_') }} {% endfor %}{% endif %}{% if vnis is defined %} \
-                 {% for vni in vni_profiles|selectattr('name', 'in', vnis.profiles|default([])) %}vni{{ vni.vxlan_id }} {% endfor %}{% endif %}{% if bonds is defined %} \
-                 {% for bond in bonds %}{{ bond.name }} {% endfor %}{% endif %}
+{% if bridge.interfaces is defined %}
+    bridge-ports {% for interface in bridge.interfaces %}{{ interface.name }} {% endfor %}
+{% endif %}
 
-    bridge-vids {% for vlan in vlan_profiles|selectattr('name', 'in', vlans.profiles|default([])) %}{{ vlan.id }} {% endfor %} 
+{%- if bonds is defined %}
+    bridge-ports {% for bond in bonds %}{{ bond.name }} {% endfor %}
+{% endif %}
 
+{%- if mlag is defined %}
+    bridge-ports peerlink
+    bridge-ports {% for mlag_bond in mlag.bonds %}{{ mlag_bond.name }} {% endfor %}
+{% endif %}
+
+{% if vni is defined %}
+    bridge-ports {% for vni in vni_profiles|selectattr('name', 'in', vni.profiles) %}{{ vni.name }} {% endfor %}
+{% endif %}
+
+    bridge-vids {% for vid in bridge.vids %}{{ vid }} {% endfor %} 
     bridge-vlan-aware yes
+{% for extra in bridge.extras|default() %}
+    {{ extra }}
+{% endfor %}
+
+

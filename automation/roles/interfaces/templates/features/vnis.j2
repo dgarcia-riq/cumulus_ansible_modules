@@ -1,17 +1,22 @@
+{% if comments|default(False) %}
 ###############
 # VNIs
 ###############
-
-{% for profile in vnis.profiles %}
+{{ vni.profiles | default() | to_nice_yaml | comment(prefix='# vni.profiles:', postfix='') -}} 
+{% endif %}
+{% for profile in vni.profiles %}
 {%   for vni in vni_profiles|selectattr('name', 'equalto', profile) %}
-auto vni{{ vni.vxlan_id }}
-iface vni{{ vni.vxlan_id }}
+{%     if comments|default(False) %}
+{{ vni | default() | to_nice_yaml | comment(prefix='# vni:', postfix='') -}}
+{%     endif %}
+auto {{ vni.name }}
+iface {{ vni.name }}
     bridge-access {{ vni.vlan_id }}
-    bridge-arp-nd-suppress on
-    bridge-learning off
-    mstpctl-bpduguard yes
-    mstpctl-portbpdufilter yes
     vxlan-id {{ vni.vxlan_id }}
+{%     for extra in vni.extras|default() %}
+    {{ extra }}
+{%     endfor %}
 
 {%   endfor %}
 {% endfor %}
+

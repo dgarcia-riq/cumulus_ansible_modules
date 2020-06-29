@@ -1,0 +1,277 @@
+# Ansible Managed File
+
+
+
+###############
+# Loopback
+###############
+# lopback:
+# clag_vxlan_anycast_ip: 10.0.1.254
+# ips:
+# - 10.10.10.63/32
+# vxlan_local_tunnel_ip: 10.10.10.63
+# 
+
+auto lo
+iface lo inet loopback
+    address 10.10.10.63/32
+    clagd-vxlan-anycast-ip 10.0.1.254
+    vxlan-local-tunnelip 10.10.10.63
+
+###############
+# Mgmt interface
+###############
+# mgmt:
+# ''
+# 
+
+auto mgmt
+iface mgmt
+    vrf-table auto
+    address 127.0.0.1/8
+    address ::1/128
+
+auto eth0
+iface eth0 inet dhcp
+    vrf mgmt
+
+###############
+# Bridge
+###############
+# bridge:
+# vids:
+# - 10
+# - 20
+# 
+
+auto bridge
+iface bridge
+    bridge-ports peerlink
+    bridge-ports bond3 
+    bridge-ports vni10 vni20 
+    bridge-vids 10 20  
+    bridge-vlan-aware yes
+
+###############
+# VNIs
+###############
+# vni.profiles:
+# - vni10
+# - vni20
+# 
+ 
+# vni:
+# extras:
+# - mstpctl-portbpdufilter yes
+# - mstpctl-bpduguard yes
+# - bridge-learning off
+# - bridge-arp-nd-suppress on
+# name: vni10
+# vlan_id: 10
+# vxlan_id: 10
+# 
+
+auto vni10
+iface vni10
+    bridge-access 10
+    vxlan-id 10
+    mstpctl-portbpdufilter yes
+    mstpctl-bpduguard yes
+    bridge-learning off
+    bridge-arp-nd-suppress on
+
+# vni:
+# extras:
+# - mstpctl-portbpdufilter yes
+# - mstpctl-bpduguard yes
+# - bridge-learning off
+# - bridge-arp-nd-suppress on
+# name: vni20
+# vlan_id: 20
+# vxlan_id: 20
+# 
+
+auto vni20
+iface vni20
+    bridge-access 20
+    vxlan-id 20
+    mstpctl-portbpdufilter yes
+    mstpctl-bpduguard yes
+    bridge-learning off
+    bridge-arp-nd-suppress on
+
+
+###############
+# SVI
+###############
+# svi.profiles:
+# - border01_vlan10
+# - border01_vlan20
+# 
+ 
+# vlan:
+# address:
+# - 10.1.10.2/24
+# address_virtual:
+# - 00:00:00:00:00:1a 10.1.10.1/24
+# id: 10
+# name: border01_vlan10
+# 
+ 
+auto vlan10
+iface vlan10
+    address 10.1.10.2/24
+    address-virtual 00:00:00:00:00:1a 10.1.10.1/24
+    vlan-raw-device bridge
+    vlan-id 10
+
+# vlan:
+# address:
+# - 10.1.20.2/24
+# address_virtual:
+# - 00:00:00:00:00:1a 10.1.20.1/24
+# id: 20
+# name: border01_vlan10
+# 
+ 
+auto vlan20
+iface vlan20
+    address 10.1.20.2/24
+    address-virtual 00:00:00:00:00:1a 10.1.20.1/24
+    vlan-raw-device bridge
+    vlan-id 20
+
+ 
+ 
+
+###############
+# SWPs
+###############
+# interfaces:
+# -   name: swp51
+#     profile: leaf_spine
+# -   name: swp52
+#     profile: leaf_spine
+# -   name: swp53
+#     profile: leaf_spine
+# -   name: swp54
+#     profile: leaf_spine
+# 
+
+# profile:
+# extras:
+# - alias fabric link
+# name: leaf_spine
+# 
+
+auto swp51
+iface swp51
+    alias fabric link
+ 
+# profile:
+# extras:
+# - alias fabric link
+# name: leaf_spine
+# 
+
+auto swp52
+iface swp52
+    alias fabric link
+ 
+# profile:
+# extras:
+# - alias fabric link
+# name: leaf_spine
+# 
+
+auto swp53
+iface swp53
+    alias fabric link
+ 
+# profile:
+# extras:
+# - alias fabric link
+# name: leaf_spine
+# 
+
+auto swp54
+iface swp54
+    alias fabric link
+ 
+
+###############
+# Mlag and peerlink
+###############
+# mlag.sysmac:
+# 44:38:39:BE:EF:FF
+# ...
+# 
+
+# mlag.priority:
+# primary
+# ...
+# 
+
+# mlag.peerlinks:
+# - swp49
+# - swp50
+# 
+
+# mlag.backup:
+# 10.10.10.64
+# ...
+# 
+
+auto swp49
+iface swp49
+    alias peerlink
+
+auto swp50
+iface swp50
+    alias peerlink
+
+
+auto peerlink
+iface peerlink
+    bond-slaves swp49 swp50 
+auto peerlink.4094
+iface peerlink.4094
+    clagd-backup-ip 10.10.10.64
+    clagd-peer-ip linklocal
+    clagd-priority 1000
+    clagd-sys-mac 44:38:39:BE:EF:FF
+
+###############
+# Mlag Bonds
+###############
+# mlag.bonds:
+# -   id: 1
+#     name: bond3
+#     ports:
+#     - swp3
+#     profile: mlagBondProfileFW
+# 
+
+# bridge_vids:
+# - 10
+# - 20
+# extras:
+# - bond-lacp-bypass-allow yes
+# - mstpctl-bpduguard yes
+# - mstpctl-portadminedge yes
+# name: mlagBondProfileFW
+# 
+
+auto swp3
+iface swp3
+    alias bond member of bond3
+auto bond3
+iface bond3
+    alias bond profile mlagBondProfileFW on swp3
+    clag-id 1
+    bridge-vids 10 20
+    bond-slaves swp3 
+    bond-lacp-bypass-allow yes
+    mstpctl-bpduguard yes
+    mstpctl-portadminedge yes
+
