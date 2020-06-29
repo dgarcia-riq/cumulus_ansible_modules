@@ -1,20 +1,33 @@
-
+{% if comments|default(False) %}
 ###############
 # SVI
 ###############
-
-{% for profile in vlans.profiles %}
-{%   for vlan in vlan_profiles|selectattr('name', 'equalto', profile) %}
+{{ svi.profiles | default() | to_nice_yaml | comment(prefix='# svi.profiles:', postfix='') -}} 
+{% endif %}
+{% for profile in svi.profiles %}
+{%   for vlan in svi_profiles|selectattr('name', 'equalto', profile) %}
+{%     if comments|default(False) %}
+{{ vlan | default() | to_nice_yaml | comment(prefix='# vlan:', postfix='') -}} 
+{%     endif %}
 auto vlan{{ vlan.id }}
 iface vlan{{ vlan.id }}
-{%     for svi in vlan.svis|default([]) %}
-    address {{ svi.ip }}
+{%     if vlan.hwaddress is defined %}
+    hwaddress {{ vlan.hwaddress }}
+{%     endif %}
+{%     for address in vlan.address|default() %}
+    address {{ address }}
 {%     endfor %}
-{%     for vrr in vlan.vrrs|default([]) %}
-    address-virtual {{ vrr.mac }} {{ vrr.ip }}
+{%     for address in vlan.address_virtual|default() %}
+    address-virtual {{ address }}
 {%     endfor %}
+{%     if vlan.vrf is defined %}
+    vrf {{ vlan.vrf }}
+{%     endif %}
     vlan-raw-device bridge
     vlan-id {{ vlan.id }}
+{%     for extra in vlan.extras|default() %}
+    {{ extra }}
+{%     endfor %}
 
 {%   endfor %} 
 {% endfor %}

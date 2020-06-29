@@ -1,24 +1,22 @@
 {{ ansible_managed }}
-
-
 {% include './features/loopback.j2' %}
 {% include './features/mgmt.j2' %}
-{% if swps is defined %}
-{%   include './features/swps.j2' %}
+{% if vrf is defined %}
+{%   include './features/vrfs.j2' %}
 {% endif %}
-{% if bgp is defined %}
-{%   if bgp.fabric is defined %}
-{%     include './features/fabric.j2' %}
-{%   endif %}
+{% if bridge is defined %}
+{%   include './features/bridge.j2' %}
 {% endif %}
-{% if vnis is defined %}
+{% if vni is defined %}
 {%   include './features/vnis.j2' %}
+{% endif %}
+{% if svi is defined %}
+{%   include './features/svis.j2' %}
+{% endif %}
+{% if interfaces is defined %}
+{%   include './features/swps.j2' %}
 {% endif %}
 {% if mlag is defined %}
 {%   include './features/mlag.j2' %}
-{%   include './features/clagbonds.j2' %}
-{% endif %}
-{% if vlans is defined %}
-{%   include './features/bridge.j2' %}
-{%   include './features/svis.j2' %}
+{%   include './features/mlagbonds.j2' %}
 {% endif %}

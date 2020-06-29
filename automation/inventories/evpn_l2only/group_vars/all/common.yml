@@ -1,0 +1,61 @@
+---
+fabric_name: evpn_l2only
+bgp_asn_prefix: 651
+vxlan_local_loopback_subnet: 10.10.10
+vxlan_anycast_loopback_subnet: 10.0.1
+mlag_sysmac_prefix: 44:38:39:BE:EF
+interface_profiles:
+  - name: leaf_spine
+    extras:
+      - "alias fabric link"
+svi_profiles:
+  - name: leaf_vlan10
+    id: 10
+    extras:
+      - "ip-forward off"
+      - "ip6-forward off"
+  - name: leaf_vlan20
+    id: 20
+    extras:
+      - "ip-forward off"
+      - "ip6-forward off"
+mlag_bond_profiles:
+  - name: mlagBondProfileA
+    bridge_access: 10
+    extras:
+      - "bond-lacp-bypass-allow yes"
+      - "mstpctl-bpduguard yes"
+      - "mstpctl-portadminedge yes"
+  - name: mlagBondProfileB
+    bridge_access: 20
+    extras:
+      - "bond-lacp-bypass-allow yes"
+      - "mstpctl-bpduguard yes"
+      - "mstpctl-portadminedge yes"
+  - name: mlagBondProfileFW
+    bridge_vids: [10, 20]
+    extras:
+      - "bond-lacp-bypass-allow yes"
+      - "mstpctl-bpduguard yes"
+      - "mstpctl-portadminedge yes"
+port_profiles:
+  - name: orphan_access_vlan10
+    vlan: 10
+vni_profiles:
+  - name: vni10
+    vlan_id: 10
+    vxlan_id: 10
+    extras:
+      - "mstpctl-portbpdufilter yes"
+      - "mstpctl-bpduguard yes"
+      - "bridge-learning off"
+      - "bridge-arp-nd-suppress on"
+  - name: vni20
+    vlan_id: 20
+    vxlan_id: 20
+    extras:
+      - "mstpctl-portbpdufilter yes"
+      - "mstpctl-bpduguard yes"
+      - "bridge-learning off"
+      - "bridge-arp-nd-suppress on"
+

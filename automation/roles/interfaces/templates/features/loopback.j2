@@ -1,11 +1,12 @@
-
+{% if comments|default(False) %}
 ###############
 # Loopback
 ###############
-
+{{ loopback | default() | to_nice_yaml | comment(prefix='# lopback:', postfix='') -}}
+{% endif %}
 auto lo
 iface lo inet loopback
-{% for loopback in loopback.ips %}
+{% for loopback in loopback.ips|default() %}
     address {{ loopback }}
 {% else %}
     address 127.0.0.1
@@ -16,3 +17,6 @@ iface lo inet loopback
 {% if loopback.vxlan_local_tunnel_ip is defined %}
     vxlan-local-tunnelip {{ loopback.vxlan_local_tunnel_ip }}
 {% endif %}
+{% for extra in loopback.extras|default() %}
+    {{ extra }}
+{% endfor %}

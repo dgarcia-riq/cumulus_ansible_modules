@@ -1,11 +1,18 @@
-
+{% if comments|default(False) %}
 ###############
 # SWPs
 ###############
-
-{% for interface in swps %}
+{{ interfaces | default() | to_nice_yaml | comment(prefix='# interfaces:', postfix='') -}}
+{% endif %}
+{% for interface in interfaces %}
+{%   for profile in interface_profiles|selectattr('name', 'equalto', interface.profile) %}
+{%     if comments|default(False) %}
+{{ profile | default() | to_nice_yaml | comment(prefix='# profile:', postfix='') -}}
+{%     endif %}
 auto {{ interface.name }}
 iface {{ interface.name }}
-
-
+{%     for extra in profile.extras|default() %}
+    {{ extra }}
+{%     endfor %}
+{%   endfor %} 
 {% endfor %}
