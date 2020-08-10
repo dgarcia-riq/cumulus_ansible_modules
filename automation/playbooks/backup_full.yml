@@ -4,8 +4,7 @@
   gather_facts: false
   tasks:
   - name: Backup Full Configuration
-    shell: net show configuration files > {{inventory_hostname}}
+    shell: net show configuration files > {{ inventory_hostname }}
 
   - name: Copy Full Config to Local
-    fetch: src=/home/cumulus/{{inventory_hostname}} dest=./backup_full/{{inventory_hostname}} flat=yes
-
+    fetch: src=/home/cumulus/{{ inventory_hostname }} dest=./backup_full/{{ inventory_hostname }} flat=yes

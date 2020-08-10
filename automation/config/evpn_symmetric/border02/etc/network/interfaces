@@ -38,7 +38,6 @@ iface vniRED
     mstpctl-bpduguard yes
     bridge-learning off
     bridge-arp-nd-suppress on
-
 auto vniBLUE
 iface vniBLUE
     bridge-access 4002
@@ -47,7 +46,6 @@ iface vniBLUE
     mstpctl-bpduguard yes
     bridge-learning off
     bridge-arp-nd-suppress on
-
 auto vlan4001
 iface vlan4001
     hwaddress 44:38:39:BE:EF:FF
@@ -55,7 +53,6 @@ iface vlan4001
     vlan-raw-device bridge
     vlan-id 4001
 
- 
 auto vlan4002
 iface vlan4002
     hwaddress 44:38:39:BE:EF:FF
@@ -63,22 +60,21 @@ iface vlan4002
     vlan-raw-device bridge
     vlan-id 4002
 
- 
-auto swp51
+ auto swp51
 iface swp51
-    alias to spine
+    alias leaf to spine
  
 auto swp52
 iface swp52
-    alias to spine
+    alias leaf to spine
  
 auto swp53
 iface swp53
-    alias to spine
+    alias leaf to spine
  
 auto swp54
 iface swp54
-    alias to spine
+    alias leaf to spine
  
 auto swp49
 iface swp49
@@ -99,9 +95,11 @@ iface peerlink.4094
 auto swp3
 iface swp3
     alias bond member of bond3
+    mtu 9000
 auto bond3
 iface bond3
-    alias bond profile mlagBondProfileFW on swp3
+    alias bond3 on swp3
+    mtu 9000
     clag-id 1
     bridge-vids 10 20 30
     bond-slaves swp3 

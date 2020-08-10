@@ -30,7 +30,6 @@ iface vni10
     mstpctl-bpduguard yes
     bridge-learning off
     bridge-arp-nd-suppress on
-
 auto vni20
 iface vni20
     bridge-access 20
@@ -39,7 +38,6 @@ iface vni20
     mstpctl-bpduguard yes
     bridge-learning off
     bridge-arp-nd-suppress on
-
 auto vlan10
 iface vlan10
     vlan-raw-device bridge
@@ -47,7 +45,6 @@ iface vlan10
     ip-forward off
     ip6-forward off
 
- 
 auto vlan20
 iface vlan20
     vlan-raw-device bridge
@@ -55,22 +52,21 @@ iface vlan20
     ip-forward off
     ip6-forward off
 
- 
-auto swp51
+ auto swp51
 iface swp51
-    alias fabric link
+    alias leaf to spine
  
 auto swp52
 iface swp52
-    alias fabric link
+    alias leaf to spine
  
 auto swp53
 iface swp53
-    alias fabric link
+    alias leaf to spine
  
 auto swp54
 iface swp54
-    alias fabric link
+    alias leaf to spine
  
 auto swp49
 iface swp49
@@ -91,9 +87,11 @@ iface peerlink.4094
 auto swp1
 iface swp1
     alias bond member of bond1
+    mtu 9000
 auto bond1
 iface bond1
-    alias bond profile mlagBondProfileA on swp1
+    alias bond1 on swp1
+    mtu 9000
     clag-id 1
     bridge-access 10
     bond-slaves swp1 
@@ -104,9 +102,11 @@ iface bond1
 auto swp2
 iface swp2
     alias bond member of bond2
+    mtu 9000
 auto bond2
 iface bond2
-    alias bond profile mlagBondProfileB on swp2
+    alias bond2 on swp2
+    mtu 9000
     clag-id 2
     bridge-access 20
     bond-slaves swp2 

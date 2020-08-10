@@ -1,0 +1,169 @@
+---
+stages:
+  - setup
+  - oob-mgmt bringup
+  - network bringup
+  - provision simulation
+  - test the simulation
+  - cleanup simulation
+
+# Global variables: this block will be applied to every job automatically (inherited)
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  SIMULATION_PATH: "./cldemo2/simulation"
+  SIMULATION_PREFIX: "simulation_{{ site }}_"
+
+{{ site }}-prep:
+  stage: setup
+  script:
+    - bash ./cicd/prep.sh $SIMULATION_PREFIX
+  tags:
+    - sim-server
+
+#todo: this could be a python script that runs in a container on a shared runner
+{{ site }}-cleanup-old-oob-runners:
+  stage: setup
+  image: python:3.6
+  before_script:
+    - apt update -qy && apt install -qy jq
+  script:
+    - bash ./cicd/remove-oob-runners.sh $API_KEY {{ site }}
+
+{{ site }}-tc-build:
+  stage: setup
+  image: python:3.6
+  before_script:
+    - curl https://gitlab.com/cumulus-consulting/tools/topology_converter/-/raw/master/requirements.txt > requirements.txt
+    - pip3 install -r requirements.txt
+    - TUNNEL_IP=`printf "127.%d.%d.%d\n" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))"`
+  script:
+    - cd $SIMULATION_PATH
+    - python3 topology_converter.py {{ topology_definition_file }} -p libvirt -cmd -i $TUNNEL_IP --prefix $SIMULATION_PREFIX
+  artifacts:
+    expire_in: 1 week
+    untracked: true
+    paths:
+      - $SIMULATION_PATH
+
+{{ site }}-build-oob-mgmt:
+  stage: oob-mgmt bringup
+  retry: 2
+  before_script:
+    - export VAGRANT_FORCE_COLOR=true
+  script:
+    - cd $SIMULATION_PATH
+    - vagrant up oob-mgmt-server oob-mgmt-switch
+    - vagrant status
+  after_script:
+    - sleep 30
+  artifacts:
+    expire_in: 1 week
+    untracked: true
+    paths:
+      - $SIMULATION_PATH
+  tags:
+    - sim-server
+  needs:
+    - {{ site }}-tc-build
+
+{{ site }}-setup-runner-on-oob-mgmt-server:
+  stage: network bringup
+  before_script:
+    - cd $SIMULATION_PATH
+  script:
+    - vagrant ssh oob-mgmt-server -c "sudo gitlab-runner register --non-interactive --url https://gitlab.com --registration-token ${RUNNER_REG_TOKEN} --description oob-mgmt-server:${CI_JOB_ID} --tag-list {{ site }}:oob-mgmt --executor shell"
+  tags:
+    - sim-server
+  needs:
+    - {{ site }}-build-oob-mgmt
+
+# todo: vagrant up based on vagrant status or/vagranfile (dynamic from topology_converter stage)
+{{ site }}-build-network:
+  stage: network bringup
+  resource_group: network-bringup
+  before_script:
+    - export VAGRANT_FORCE_COLOR=true
+    - cd $SIMULATION_PATH
+  script:
+    - vagrant up /leaf/ /spine/ /border/ fw1 
+    - vagrant up server01 server02 server03 server04 server05 server06
+    - vagrant status
+  after_script:
+    - sleep 60
+  artifacts:
+    expire_in: 1 week
+    untracked: true
+    paths:
+      - $SIMULATION_PATH
+  tags:
+    - sim-server
+  needs:
+    - {{ site }}-build-oob-mgmt
+
+{{ site }}-provision:
+  stage: provision simulation
+  before_script:
+    - cd ./automation
+  script:
+    - ansible-playbook playbooks/deploy.yml -i inventories/{{ site }} --diff
+    - ansible-playbook playbooks/deploy-netq.yml -i inventories/{{ site }} --extra-vars "@../cicd/tests/{{ site }}/ci-overrides.yml"
+  after_script:
+    - sleep 60
+  tags:
+    - {{ site }}:oob-mgmt
+  dependencies: []
+  needs:
+    - {{ site }}-build-network
+
+# needs logic to run 'default' tests if the site specific folder isn't there
+{{ site }}-test-from-oob-server:
+  stage: test the simulation
+  retry: 2
+  script:
+    - bash ./cicd/tests/{{ site }}/oob-server-tests-{{ site }}.sh
+  tags:
+    - {{ site }}:oob-mgmt
+  dependencies: []
+  needs:
+    - {{ site }}-provision
+
+# needs logic to run 'default' tests if the site specific folder isn't there
+{{ site }}-test-from-netq-ts:
+  stage: test the simulation
+  retry: 2
+  before_script:
+    - sleep 60
+  script:
+    - bash ./cicd/tests/{{ site }}/netq-ts-tests-{{ site }}.sh
+  tags:
+    - {{ site }}:netq-ts
+  dependencies: []
+  needs:
+    - {{ site }}-provision
+
+{{ site }}-cleanup-simulation:
+  stage: cleanup simulation
+  script:
+    - cd $SIMULATION_PATH
+    - date
+    - vagrant destroy -f || echo "Didn't get rc=0 but this isn't always a problem here"
+  tags:
+    - sim-server
+  needs:
+    - {{ site }}-test-from-netq-ts
+    - {{ site }}-test-from-oob-server
+    - {{ site }}-build-network
+
+# todo: make this a python script that runs in a shared runner python docker container
+# It's just some API calls to gitlab, could be from anywhere
+{{ site }}-cleanup-oob-runner:
+  stage: cleanup simulation
+  image: python:3.6
+  before_script:
+    - apt update -qy && apt install -qy jq
+  script:
+    - bash ./cicd/remove-oob-runners.sh $API_KEY {{ site }}
+  dependencies: []
+  needs:
+    - {{ site }}-test-from-oob-server
+

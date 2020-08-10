@@ -1,15 +1,31 @@
-vni:
-  profiles:
-    - vni10
-    - vni20
+loopback:
+  ips:
+    - "{{vxlan_local_loopback_subnet}}.3/32"
+  vxlan_local_tunnel_ip: "{{vxlan_local_loopback_subnet}}.3"
+  clag_vxlan_anycast_ip: "{{vxlan_anycast_loopback_subnet}}.2"
+interfaces:
+  - { name: swp51, profile: "{{ leaf_spine_interface }}" }
+  - { name: swp52, profile: "{{ leaf_spine_interface }}" }
+  - { name: swp53, profile: "{{ leaf_spine_interface }}" }
+  - { name: swp54, profile: "{{ leaf_spine_interface }}" }
+vnis:
+  - "{{ vni10_leaf }}"
+  - "{{ vni20_leaf }}"
 bridge:
   vids:
     - 10
     - 20
-svi:
-  profiles:
-    - leaf_vlan10
-    - leaf_vlan20
+mlag:
+  sysmac: "{{mlag_sysmac_prefix}}:BB"
+  priority: primary
+  peerlinks: [ swp49, swp50 ]
+  backup: "{{vxlan_local_loopback_subnet}}.4"
+  bonds:
+    - { profile: "{{ mlagBondProfileA }}", name: bond1, ports: [swp1], id: 1 }
+    - { profile: "{{ mlagBondProfileB }}", name: bond2, ports: [swp2], id: 2 }
+vlans:
+  - "{{ leaf_vlan10 }}"
+  - "{{ leaf_vlan20 }}"
 bgp:
   asn: "{{ bgp_asn_prefix }}02"
   router_id: "{{vxlan_local_loopback_subnet}}.3"
@@ -31,21 +47,3 @@ bgp:
       neighbors:
         - { interface: underlay, activate: yes }
       advertise_all_vni: yes
-loopback:
-  ips:
-    - "{{vxlan_local_loopback_subnet}}.3/32"
-  vxlan_local_tunnel_ip: "{{vxlan_local_loopback_subnet}}.3"
-  clag_vxlan_anycast_ip: "{{vxlan_anycast_loopback_subnet}}.2"
-mlag:
-  sysmac: "{{mlag_sysmac_prefix}}:BB"
-  priority: primary
-  peerlinks: [ swp49, swp50 ]
-  backup: "{{vxlan_local_loopback_subnet}}.4"
-  bonds:
-    - { profile: mlagBondProfileA, name: bond1, ports: [swp1], id: 1 }
-    - { profile: mlagBondProfileB, name: bond2, ports: [swp2], id: 2 }
-interfaces:
-  - { name: swp51, profile: leaf_spine }
-  - { name: swp52, profile: leaf_spine }
-  - { name: swp53, profile: leaf_spine }
-  - { name: swp54, profile: leaf_spine }

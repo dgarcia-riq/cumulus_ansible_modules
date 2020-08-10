@@ -19,8 +19,8 @@ iface bridge
     bridge-ports {% for mlag_bond in mlag.bonds %}{{ mlag_bond.name }} {% endfor %}
 {% endif %}
 
-{% if vni is defined %}
-    bridge-ports {% for vni in vni_profiles|selectattr('name', 'in', vni.profiles) %}{{ vni.name }} {% endfor %}
+{% if vnis is defined %}
+    bridge-ports {% for vni in vnis %}{{ vni.name }} {% endfor %}
 {% endif %}
 
     bridge-vids {% for vid in bridge.vids %}{{ vid }} {% endfor %} 
