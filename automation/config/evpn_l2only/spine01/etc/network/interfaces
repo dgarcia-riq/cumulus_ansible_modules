@@ -14,25 +14,25 @@ iface eth0 inet dhcp
     vrf mgmt
 auto swp1
 iface swp1
-    alias fabric link
+    alias leaf to spine
  
 auto swp2
 iface swp2
-    alias fabric link
+    alias leaf to spine
  
 auto swp3
 iface swp3
-    alias fabric link
+    alias leaf to spine
  
 auto swp4
 iface swp4
-    alias fabric link
+    alias leaf to spine
  
 auto swp5
 iface swp5
-    alias fabric link
+    alias leaf to spine
  
 auto swp6
 iface swp6
-    alias fabric link
+    alias leaf to spine
  

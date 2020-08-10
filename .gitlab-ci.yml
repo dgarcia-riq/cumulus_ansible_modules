@@ -1,0 +1,127 @@
+---
+# I'm hitting this issue: https://gitlab.com/gitlab-org/gitlab/-/issues/212373
+# tl;dr - I can't trigger all the child pipelines in the same job.
+# Seems like some object storage contention issue fetching the file from the artifact?
+# So for now, we can use DAG (needs:) to kinda "fork", pause for 15 seconds, then trigger the next child pipeline.
+stages:
+  - lint
+  - setup
+  - trigger l2 pipeline
+  - sleep1
+  - trigger cent pipeline
+  - sleep2
+  - trigger sym pipeline
+
+lint:
+  stage: setup
+  image: python:3.6
+  before_script:
+    - pip3 install yamllint ansible-lint
+  script:
+    - yamllint ./ -c cicd/.yamllint-ansible
+    - cd automation
+    - ansible-lint -x 301 -x 305 # skip rules 301 and 305 related to use of shell module it's fine
+  tags:
+    - sim-server
+
+generate-pipelines:
+  stage: setup
+  image: python:3.6
+  before_script:
+    - pip3 install j2cli[yaml]
+  script:
+    - bash ./cicd/generate-pipelines.sh
+  artifacts:
+    expire_in: 1 week
+    untracked: true
+    paths:
+      - ./cicd/
+  tags:
+    - sim-server
+
+# need to manually add pipeline launch jobs for now :(
+# Need two things from gitlab to make this dynamic
+# 1 - Ability for child pipeliens to spawn another child
+# 2 - Way for only:changes or rules:changes to work in child pipelines
+launch l2only pipeline:
+  stage: trigger l2 pipeline
+  trigger:
+    include:
+      - artifact: evpn_l2only-pipeline.yml
+        job: generate-pipelines
+    strategy: depend
+  only:
+    refs:
+      - /^dev.*$/
+    changes:
+      - cicd/tests/evpn_l2only/*
+      - cicd/.gitlab-ci-template.j2
+      - automation/*
+      - automation/roles/**/*
+      - automation/playbooks/**/*
+      - automation/inventories/evpn_l2only/**/*
+      - .gitlab-ci.yml
+  needs:
+    - generate-pipelines
+    - lint
+
+pause-1:
+  stage: sleep1
+  tags:
+    - sim-server
+  script:
+    - sleep 15
+  needs:
+    - generate-pipelines
+    - lint
+
+launch centralized pipeline:
+  stage: trigger cent pipeline
+  trigger:
+    include:
+      - artifact: evpn_centralized-pipeline.yml
+        job: generate-pipelines
+    strategy: depend
+  only:
+    refs:
+      - /^dev.*$/
+    changes:
+      - cicd/tests/evpn_centralized/*
+      - cicd/.gitlab-ci-template.j2
+      - automation/*
+      - automation/roles/**/*
+      - automation/playbooks/**/*
+      - automation/inventories/evpn_centralized/**/*
+      - .gitlab-ci.yml
+  needs:
+    - pause-1
+
+pause-2:
+  stage: sleep2
+  tags:
+    - sim-server
+  script:
+    - sleep 15
+  needs:
+    - pause-1
+
+launch symmetric pipeline:
+  stage: trigger sym pipeline
+  trigger:
+    include:
+      - artifact: evpn_symmetric-pipeline.yml
+        job: generate-pipelines
+    strategy: depend
+  only:
+    refs:
+      - /^dev.*$/
+    changes:
+      - cicd/tests/evpn_symmetric/*
+      - cicd/.gitlab-ci-template.j2
+      - automation/*
+      - automation/roles/**/*
+      - automation/playbooks/**/*
+      - automation/inventories/evpn_symmetric/**/*
+      - .gitlab-ci.yml
+  needs:
+    - pause-2

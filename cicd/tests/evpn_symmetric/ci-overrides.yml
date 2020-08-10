@@ -1,0 +1,8 @@
+---
+# Ansible variable overrides for CI
+# Currently only used to override NetQ config in the inventories/evpn_xxxx/group_vars/all/services.yml file
+# This gets passed in as --extra-vars on the ansible-playbook cli
+# Ideally we don't want overrides: they represent differences between staging(simulation) and prod. That's generally not a good thing.
+netq:
+  agent_server: 192.0.2.253
+  version: latest

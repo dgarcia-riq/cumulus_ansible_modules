@@ -24,8 +24,10 @@ spine04
 [host]
 server01
 server02
+server03
 server04
 server05
+server06
 
 [pod1:children]
 fw

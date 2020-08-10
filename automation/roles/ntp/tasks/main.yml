@@ -1,7 +1,7 @@
 ---
 - name: Set time zone
   timezone:
-    name: "{{ntp.timezone}}"
+    name: '{{ ntp.timezone if ntp.timezone is defined else "Etc/UTC" }}'
 
 - name: Configure NTP service configuration
   template:

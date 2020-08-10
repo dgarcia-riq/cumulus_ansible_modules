@@ -38,7 +38,6 @@ iface vni10
     mstpctl-bpduguard yes
     bridge-learning off
     bridge-arp-nd-suppress on
-
 auto vni20
 iface vni20
     bridge-access 20
@@ -47,7 +46,6 @@ iface vni20
     mstpctl-bpduguard yes
     bridge-learning off
     bridge-arp-nd-suppress on
-
 auto vni30
 iface vni30
     bridge-access 30
@@ -56,7 +54,6 @@ iface vni30
     mstpctl-bpduguard yes
     bridge-learning off
     bridge-arp-nd-suppress on
-
 auto vniRED
 iface vniRED
     bridge-access 4001
@@ -65,7 +62,6 @@ iface vniRED
     mstpctl-bpduguard yes
     bridge-learning off
     bridge-arp-nd-suppress on
-
 auto vniBLUE
 iface vniBLUE
     bridge-access 4002
@@ -74,7 +70,6 @@ iface vniBLUE
     mstpctl-bpduguard yes
     bridge-learning off
     bridge-arp-nd-suppress on
-
 auto vlan10
 iface vlan10
     address 10.1.10.2/24
@@ -83,7 +78,6 @@ iface vlan10
     vlan-raw-device bridge
     vlan-id 10
 
- 
 auto vlan20
 iface vlan20
     address 10.1.20.2/24
@@ -92,7 +86,6 @@ iface vlan20
     vlan-raw-device bridge
     vlan-id 20
 
- 
 auto vlan30
 iface vlan30
     address 10.1.30.2/24
@@ -101,7 +94,6 @@ iface vlan30
     vlan-raw-device bridge
     vlan-id 30
 
- 
 auto vlan4001
 iface vlan4001
     hwaddress 44:38:39:BE:EF:AA
@@ -109,7 +101,6 @@ iface vlan4001
     vlan-raw-device bridge
     vlan-id 4001
 
- 
 auto vlan4002
 iface vlan4002
     hwaddress 44:38:39:BE:EF:AA
@@ -117,22 +108,21 @@ iface vlan4002
     vlan-raw-device bridge
     vlan-id 4002
 
- 
-auto swp51
+ auto swp51
 iface swp51
-    alias to spine
+    alias leaf to spine
  
 auto swp52
 iface swp52
-    alias to spine
+    alias leaf to spine
  
 auto swp53
 iface swp53
-    alias to spine
+    alias leaf to spine
  
 auto swp54
 iface swp54
-    alias to spine
+    alias leaf to spine
  
 auto swp49
 iface swp49
@@ -153,9 +143,11 @@ iface peerlink.4094
 auto swp1
 iface swp1
     alias bond member of bond1
+    mtu 9000
 auto bond1
 iface bond1
-    alias bond profile mlagBondProfileA on swp1
+    alias bond1 on swp1
+    mtu 9000
     clag-id 1
     bridge-access 10
     bond-slaves swp1 
@@ -166,9 +158,11 @@ iface bond1
 auto swp2
 iface swp2
     alias bond member of bond2
+    mtu 9000
 auto bond2
 iface bond2
-    alias bond profile mlagBondProfileB on swp2
+    alias bond2 on swp2
+    mtu 9000
     clag-id 2
     bridge-access 20
     bond-slaves swp2 
@@ -179,9 +173,11 @@ iface bond2
 auto swp3
 iface swp3
     alias bond member of bond3
+    mtu 9000
 auto bond3
 iface bond3
-    alias bond profile mlagBondProfileC on swp3
+    alias bond3 on swp3
+    mtu 9000
     clag-id 3
     bridge-access 30
     bond-slaves swp3 

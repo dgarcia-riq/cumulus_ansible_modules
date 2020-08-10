@@ -4,15 +4,15 @@
   gather_facts: false
   tasks:
   - name: Copy over interfaces
-    copy: src=./backup_files/{{inventory_hostname}}/interfaces dest=/etc/network/interfaces
+    copy: src=./backup_files/{{ inventory_hostname }}/interfaces dest=/etc/network/interfaces
     notify: reload networking
 
   - name: Copy over daemons
-    copy: src=./backup_files/{{inventory_hostname}}/daemons dest=/etc/frr/daemons
+    copy: src=./backup_files/{{ inventory_hostname }}/daemons dest=/etc/frr/daemons
     notify: restart frr
 
   - name: Copy over frr
-    copy: src=./backup_files/{{inventory_hostname}}/frr.conf dest=/etc/frr/frr.conf
+    copy: src=./backup_files/{{ inventory_hostname }}/frr.conf dest=/etc/frr/frr.conf
     notify: reload frr
 
   handlers:
@@ -36,4 +36,4 @@
       update_cache: true
 
   - name: Copy over interfaces template
-    template: src=./backup_files/{{inventory_hostname}}/interfaces dest=/etc/network/interfaces
+    template: src=./backup_files/{{ inventory_hostname }}/interfaces dest=/etc/network/interfaces

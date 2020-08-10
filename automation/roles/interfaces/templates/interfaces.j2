@@ -7,11 +7,11 @@
 {% if bridge is defined %}
 {%   include './features/bridge.j2' %}
 {% endif %}
-{% if vni is defined %}
+{% if vnis is defined %}
 {%   include './features/vnis.j2' %}
 {% endif %}
-{% if svi is defined %}
-{%   include './features/svis.j2' %}
+{% if vlans is defined %}
+{%   include './features/vlans.j2' %}
 {% endif %}
 {% if interfaces is defined %}
 {%   include './features/swps.j2' %}

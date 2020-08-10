@@ -11,4 +11,3 @@
     dest: /etc/tacacs+/tac_plus.conf
   notify:
     - restart tacacs
-

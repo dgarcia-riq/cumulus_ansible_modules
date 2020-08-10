@@ -56,6 +56,13 @@ restrict source notrap nomodify noquery
 
 # Specify interfaces, don't listen on switch ports
 interface listen eth0
+{% if ntp.server_ips is defined %}
 {% for ip in ntp.server_ips %}
 server {{ ip }} iburst
 {% endfor %}
+{% else %}
+0.cumulusnetworks.pool.ntp.org
+1.cumulusnetworks.pool.ntp.org
+2.cumulusnetworks.pool.ntp.org
+3.cumulusnetworks.pool.ntp.org
+{% endif %}

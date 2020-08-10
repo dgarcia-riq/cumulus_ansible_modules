@@ -1,20 +1,33 @@
-vni:
-  profiles:
-    - vniRED
-    - vniBLUE
-vrf:
-  - name: RED
-    vxlan_id: 4001
-  - name: BLUE
-    vxlan_id: 4002
+loopback:
+  ips:
+    - "{{vxlan_local_loopback_subnet}}.63/32"
+  vxlan_local_tunnel_ip: "{{vxlan_local_loopback_subnet}}.63"
+  clag_vxlan_anycast_ip: "{{vxlan_anycast_loopback_subnet}}.254"
+interfaces:
+  - { name: swp51, profile: "{{ leaf_spine_interface }}" }
+  - { name: swp52, profile: "{{ leaf_spine_interface }}" }
+  - { name: swp53, profile: "{{ leaf_spine_interface }}" }
+  - { name: swp54, profile: "{{ leaf_spine_interface }}" }
+vnis:
+  - "{{ vniRED_leaf }}"
+  - "{{ vniBLUE_leaf }}"
 bridge:
   vids:
     - 4001
     - 4002
-svi:
-  profiles:
-    - vlan4001
-    - vlan4002
+mlag:
+  sysmac: "{{mlag_sysmac_prefix}}:FF"
+  priority: primary
+  peerlinks: [ swp49, swp50 ]
+  backup: "{{vxlan_local_loopback_subnet}}.64"
+  bonds:
+    - { profile: "{{ mlagBondProfileFW }}", name: bond3, ports: [swp3], id: 1 }
+vlans:
+  - "{{ leaf_vlan4001 }}"
+  - "{{ leaf_vlan4002 }}"
+vrf:
+  - "{{ vrf_RED }}"
+  - "{{ vrf_BLUE }}"
 bgp:
   asn: "{{ bgp_asn_prefix }}32"
   router_id: "{{vxlan_local_loopback_subnet}}.63"
@@ -59,21 +72,3 @@ bgp:
         - name: l2vpn_evpn
           extras:
             - "advertise ipv4 unicast"
-
-loopback:
-  ips:
-    - "{{vxlan_local_loopback_subnet}}.63/32"
-  vxlan_local_tunnel_ip: "{{vxlan_local_loopback_subnet}}.63"
-  clag_vxlan_anycast_ip: "{{vxlan_anycast_loopback_subnet}}.254"
-mlag:
-  sysmac: "{{mlag_sysmac_prefix}}:FF"
-  priority: primary
-  peerlinks: [ swp49, swp50 ]
-  backup: "{{vxlan_local_loopback_subnet}}.64"
-  bonds:
-    - { profile: mlagBondProfileFW, name: bond3, ports: [swp3], id: 1 }
-interfaces:
-  - { name: swp51, profile: leaf_spine }
-  - { name: swp52, profile: leaf_spine }
-  - { name: swp53, profile: leaf_spine }
-  - { name: swp54, profile: leaf_spine }
