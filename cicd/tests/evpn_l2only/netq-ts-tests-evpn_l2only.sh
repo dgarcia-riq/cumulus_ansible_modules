@@ -63,8 +63,8 @@ netq check clag include 4
 check_state
 #netq check clag include 5
 #check_state
-netq check clag include 6
-check_state
+#netq check clag include 6 # restore after NETQ-6811 is resolved
+#check_state
 netq check clag include 7
 check_state
 netq check clag include 8
