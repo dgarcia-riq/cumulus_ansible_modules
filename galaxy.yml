@@ -1,0 +1,12 @@
+namespace: "cumulusnetworks"
+name: "cumulus_linux_roles"
+version: "1.0"
+readme: "README.md"
+authors:
+    - "Cumulus Networks"
+tags:
+    - network
+    - evpn
+    - vxlan
+    - networking
+repository: "https://gitlab.com/cumulus-consulting/goldenturtle/cumulus_ansible_modules"
