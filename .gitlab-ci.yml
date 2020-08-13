@@ -19,7 +19,6 @@ lint:
     - pip3 install yamllint ansible-lint
   script:
     - yamllint ./ -c cicd/.yamllint-ansible
-    - cd automation
     - ansible-lint -x 301 -x 305 # skip rules 301 and 305 related to use of shell module it's fine
   tags:
     - sim-server
@@ -55,11 +54,10 @@ launch l2only pipeline:
       - /^dev.*$/
     changes:
       - cicd/tests/evpn_l2only/*
-      - cicd/.gitlab-ci-template.j2
-      - automation/*
-      - automation/roles/**/*
-      - automation/playbooks/**/*
-      - automation/inventories/evpn_l2only/**/*
+      - cicd/*
+      - roles/**/*
+      - playbooks/**/*
+      - inventories/evpn_l2only/**/*
       - .gitlab-ci.yml
   needs:
     - generate-pipelines
@@ -87,11 +85,10 @@ launch centralized pipeline:
       - /^dev.*$/
     changes:
       - cicd/tests/evpn_centralized/*
-      - cicd/.gitlab-ci-template.j2
-      - automation/*
-      - automation/roles/**/*
-      - automation/playbooks/**/*
-      - automation/inventories/evpn_centralized/**/*
+      - cicd/*
+      - roles/**/*
+      - playbooks/**/*
+      - inventories/evpn_centralized/**/*
       - .gitlab-ci.yml
   needs:
     - pause-1
@@ -117,11 +114,10 @@ launch symmetric pipeline:
       - /^dev.*$/
     changes:
       - cicd/tests/evpn_symmetric/*
-      - cicd/.gitlab-ci-template.j2
-      - automation/*
-      - automation/roles/**/*
-      - automation/playbooks/**/*
-      - automation/inventories/evpn_symmetric/**/*
+      - cicd/*
+      - roles/**/*
+      - playbooks/**/*
+      - inventories/evpn_symmetric/**/*
       - .gitlab-ci.yml
   needs:
     - pause-2
