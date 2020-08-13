@@ -13,151 +13,59 @@ Modules to configure a Cumulus Linux Switch
 
 - [NVIDIA Cumulus Linux Roles](#NVIDIA-cumulus-linux-roles)
   * [Roles](#roles)
-    + [backup](automation/roles/backup/README.md)
-    + [dns](automation/roles/dns/README.md)
-    + [frr](automation/roles/frr/README.md)
-    + [hostname](automation/roles/hostname/README.md)
-    + [interfaces](automation/roles/interfaces/README.md)
-    + [motd](automation/roles/motd/README.md)
-    + [ntp](automation/roles/ntp/README.md)
-    + [ptm](automation/roles/ptm/README.md)
-    + [snmp](automation/roles/snmp/README.md)
-    + [ssh](automation/roles/ssh/README.md)
-    + [syslog](automation/roles/syslog/README.md)
-    + [tacacs_client](automation/roles/tacacs_client/README.md)
-    + [tacacs_server](automation/roles/tacacs_server/README.md)
+    + [backup](roles/backup/README.md)
+    + [dns](roles/dns/README.md)
+    + [frr](roles/frr/README.md)
+    + [hostname](roles/hostname/README.md)
+    + [interfaces](roles/interfaces/README.md)
+    + [motd](roles/motd/README.md)
+    + [ntp](roles/ntp/README.md)
+    + [ptm](roles/ptm/README.md)
+    + [snmp](roles/snmp/README.md)
+    + [ssh](roles/ssh/README.md)
+    + [syslog](roles/syslog/README.md)
+    + [tacacs_client](roles/tacacs_client/README.md)
+    + [tacacs_server](roles/tacacs_server/README.md)
 
 
-## Variables
+## How to Use
 
-### backup
-Backup config files to the [config dir](automation/config)
-List of file locations to copy from switches
+Included in this repo are 3 different demos each with their own inventories:
+* [EVPN Centralized](inventories/evpn_centralized)
+* [EVPN L2Only](inventories/evpn_l2only)
+* [EVPN Symmetric](inventories/evpn_symmetric)
 
-```python
-backup.files:
-  - "/etc/network/interfaces"
-  - "/etc/frr/frr.conf"
+Push your configs with the correct inventory using the -i flag with ansible-playbook.
+```bash
+cumulus@oob-mgmt-server:~/cumulus_ansible_modules$ ansible-playbook -i inventories/evpn_centralized/ playbooks/deploy.yml
 ```
 
-### dns
-Set resolve.conf using a template
 
-```python
-dns.domain: "cumulusnetworks.com"
-```
-```python
-dns.search_domain:
-  - cumulusnetworks.com
-```
-```python
-dns.servers:
-    ipv4:
-      - "1.1.1.1"
-      - "8.8.8.8"
-    vrf: mgmt
-```
+## Requirements
 
-### frr
-Free Range Routing in /etc/frr/frr.conf and /etc/frr/daemons using idempotent templating
-
-See: [frr documentation](automation/roles/frr/README.md)
-
-### hostname
-hostname using ansible hostname module
-
-```python
-hostname: leaf01
-```
-
-### interfaces
-ifupdown2 in /etc/network/interfaces using idempotent templating
-
-See: [interfaces documentation](automation/roles/interfaces/README.md)
-
-### motd
-Message of the Day in /etc/motd and /etc/issue.net
-
-```python
-motd: |
-  Welcome to Cumulus Linux!
-  MOTD Contents
-```
-
-### ntp
-Network Time Protocol
-
-```python
-ntp.timezone: America/Los_Angeles
-```
-```python
-ntp.server_ips:
-    - 0.cumulusnetworks.pool.ntp.org
-    - 1.cumulusnetworks.pool.ntp.org
-    - 2.cumulusnetworks.pool.ntp.org
-    - 3.cumulusnetworks.pool.ntp.org
-```
-
-### ptm
-Prescriptive Topology Manager.
-
-Place the topology.dot file in the ptm role. `roles/ptm/files/topology.dot`.
-
-### snmp
-SNMP
-
-Add your variables for listening addresses under snmp.addresses as a list. Currently supports setting a read only community.
-```python
-snmp:
-  addresses:
-    - "{{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}@mgmt"
-    - "udp6:[::1]:161"
-  rocommunity: public
-```
-
-### ssh
-SSH quality of life settings. Currently sets a timeout and turns off useDNS sshd option.
-
-### syslog
-remote syslog servers using mgmt vrf.
-
-Set the syslog.servers list variable. This is the syslog restination and only supports the mgmt vrf currently.
-```python
-syslog:
-  servers:
-    - 192.168.200.1
-```
-
-### tacacs_client
-TACACS+ client and TACACS user log permissions
-
-tacacs+ client 
-```python
-tacacs:
-  vrf: mgmt
-  secret: tacacskey
-  server_ips:
-    - 192.168.200.1
-```
-
-### tacacs_server
-TACACS+ Server
-
-```python
-tacacs:
-  secret: tacacskey
-  users:
-    - name: basicuser
-      password: password
-      group: basics
-    - name: adminuser
-      password: password
-      group: admins
-  groups:
-    # admin group can do anything on network gear
-    - name: admins
-      priv_level: 15
-    # basic group can run show commands and diagnostics but not change system configuration
-    - name: basics
-      priv_level: 1
-```
+* NVIDIA Cumulus Linux Version
+  ```bash
+  cumulus@leaf01:mgmt-vrf:~$ net sh ver
+  NCLU_VERSION=1.0-cl3u32
+  DISTRIB_ID="Cumulus Linux"
+  DISTRIB_RELEASE=3.7.12
+  DISTRIB_DESCRIPTION="Cumulus Linux 3.7.12"
+  ```
+* Ansible Version
+  ```bash
+  cumulus@oob-mgmt-server:~/cumulus_ansible_modules$ ansible --version
+  ansible 2.9.11
+    config file = /home/cumulus/cumulus_ansible_modules/ansible.cfg
+    configured module search path = ['/home/cumulus/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+    ansible python module location = /home/cumulus/.local/lib/python3.6/site-packages/ansible
+    executable location = /usr/local/bin/ansible
+    python version = 3.6.9 (default, Apr 18 2020, 01:56:04) [GCC 8.4.0]
+  ```
+* Ubuntu Version
+  ```bash
+  cumulus@oob-mgmt-server:~/cumulus_ansible_modules$ cat /etc/lsb-release
+  DISTRIB_ID=Ubuntu
+  DISTRIB_RELEASE=18.04
+  DISTRIB_CODENAME=bionic
+  DISTRIB_DESCRIPTION="Ubuntu 18.04.4 LTS"
+  ```

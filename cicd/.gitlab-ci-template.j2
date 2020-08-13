@@ -88,8 +88,6 @@ variables:
     - vagrant up /leaf/ /spine/ /border/ fw1 
     - vagrant up server01 server02 server03 server04 server05 server06
     - vagrant status
-  after_script:
-    - sleep 60
   artifacts:
     expire_in: 1 week
     untracked: true
@@ -103,10 +101,10 @@ variables:
 {{ site }}-provision:
   stage: provision simulation
   before_script:
-    - cd ./automation
+    - sleep 60
   script:
-    - ansible-playbook playbooks/deploy.yml -i inventories/{{ site }} --diff
-    - ansible-playbook playbooks/deploy-netq.yml -i inventories/{{ site }} --extra-vars "@../cicd/tests/{{ site }}/ci-overrides.yml"
+    - ansible-playbook playbooks/deploy.yml -i inventories/{{ site }}/hosts --diff
+    - ansible-playbook playbooks/deploy-netq.yml -i inventories/{{ site }}/hosts --extra-vars "@cicd/tests/{{ site }}/ci-overrides.yml"
   after_script:
     - sleep 60
   tags:
@@ -151,8 +149,6 @@ variables:
     - sim-server
   needs:
     - {{ site }}-test-from-netq-ts
-    - {{ site }}-test-from-oob-server
-    - {{ site }}-build-network
 
 # todo: make this a python script that runs in a shared runner python docker container
 # It's just some API calls to gitlab, could be from anywhere
