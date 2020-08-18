@@ -2,9 +2,9 @@
 - hosts: spine leaf border fw
   become: yes
   roles:
-    - role: netq-switch
+    - role: netq_switch
 
 - hosts: host localhost
   become: yes
   roles:
-    - role: netq-servers
+    - role: netq_servers

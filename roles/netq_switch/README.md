@@ -1,4 +1,4 @@
-## netq-switch Role
+## netq_switch Role
 
 Template for `/etc/netq/netq.yml`
 
