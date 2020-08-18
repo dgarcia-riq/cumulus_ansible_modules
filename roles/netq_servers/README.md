@@ -1,4 +1,4 @@
-## netq-servers Role
+## netq_servers Role
 
 Template for `/etc/netq/netq.yml`
 

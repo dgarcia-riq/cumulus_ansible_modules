@@ -14,24 +14,24 @@
     - { role: interfaces, tags: ['interfaces'] }
     - { role: frr, tags: ['frr'] }
     - { role: backup, tags: ['backup'] }
-    #- { role: netq-switch, tags: ['netq-switch'] }
+    #- { role: netq_switch, tags: ['netq_switch'] }
 
 - hosts: fw
   become: yes
   roles:
     - { role: firewalls, tags: ['fw'] }
     - { role: backup, tags: ['backup'] }
-    #- { role: netq-switch, tags: ['netq-switch'] }
+    #- { role: netq_switch, tags: ['netq_switch'] }
 
 - hosts: host
   become: yes
   roles:
     - { role: servers, tags: ['servers'] }
     - { role: backup, tags: ['backup'] }
-    #- { role: netq-servers, tags: ['netq-servers'] }
+    #- { role: netq_servers, tags: ['netq_servers'] }
 
 - hosts: localhost
   become: yes
   roles:
     - { role: tacacs_server, tags: ['tacacs_server'] }
-    #- { role: netq-servers, tags: ['netq-servers'] }
+    #- { role: netq_servers, tags: ['netq_servers'] }
