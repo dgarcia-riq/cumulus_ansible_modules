@@ -1,4 +1,4 @@
-namespace: "cumulusnetworks"
+namespace: "dgarcia-riq"
 name: "cumulus_linux_roles"
 version: "1.0.0"
 readme: "README.md"
