@@ -10,4 +10,4 @@ tags:
     - evpn
     - vxlan
     - networking
-repository: "https://gitlab.com/cumulus-consulting/goldenturtle/cumulus_ansible_modules"
+repository: "https://github.com/dgarcia-riq/cumulus_ansible_modules.git"
