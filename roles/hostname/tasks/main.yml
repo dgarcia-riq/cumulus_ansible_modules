@@ -4,7 +4,6 @@
     name: "{{ hostname|default( inventory_hostname ) }}"
 
 - name: Set hostname in /etc/hosts
-  lineinfile:
-    path: /etc/hosts
-    regexp: '^127\.0\.1\.1'
-    line: "127.0.1.1 {{ hostname|default( inventory_hostname ) }}"
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
