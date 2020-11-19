@@ -5,4 +5,12 @@ ff02::1     ip6-allnodes
 ff02::2     ip6-allrouters
 
 127.0.1.1 {{ hostname|default( inventory_hostname ) }}
+<<<<<<< Updated upstream
 {{ ansible_default_ipv4.address }} {{ hostname|default( inventory_hostname ) }} {{ hostname|default( inventory_hostname ) }}.{{ ansible_dns.domain }}
+=======
+{% if spine_enabled is defined %}
+{{ coresw_ipv4_unicast_network }} {{ hostname|default( inventory_hostname ) }} {{ hostname|default( inventory_hostname ) }}.{{ ansible_dns.domain }}
+{% else %}
+{{ ansible_default_ipv4.address }} {{ hostname|default( inventory_hostname ) }} {{ hostname|default( inventory_hostname ) }}.{{ ansible_dns.domain }}
+{% endif %}
+>>>>>>> Stashed changes
