@@ -8,7 +8,7 @@
     src: ntp.j2
     dest: /etc/ntp.conf
   notify:
-    - stop ntp in default vrf
-    - restart ntp in mgmt vrf
+    - Stop ntp
+    - Restart ntp
 
 - meta: flush_handlers

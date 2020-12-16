@@ -1,12 +1,12 @@
 ---
-- name: stop ntp in default vrf
-  service:
-    name: ntp
+- name: Stop ntp
+  systemd:
     state: stopped
-    enabled: False
-
-- name: restart ntp in mgmt vrf
-  service:
-    name: ntp@mgmt
-    state: restarted
+    name: ntp
     enabled: True
+
+- name: Restart ntp
+  systemd:
+    state: restarted
+    enabled: true
+    name: ntp
