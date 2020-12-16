@@ -1,12 +1,12 @@
 ---
 - name: Stop ntp
-  systemd:
-    state: stopped
+  service:
     name: ntp
-    enabled: True
+    state: stopped
+    enabled: False
 
 - name: Restart ntp
-  systemd:
+  service:
+    name: ntp@mgmt
     state: restarted
-    enabled: true
-    name: ntp
+    enabled: True
