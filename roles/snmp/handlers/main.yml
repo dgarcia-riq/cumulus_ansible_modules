@@ -1,13 +1,11 @@
 ---
-- name: stop snmpd in default vrf
-  service:
-    name: snmpd
+- name: Stop snmpd
     state: stopped
-    enabled: false
+    name: snmpd
+    enabled: true
 
-- name: restart snmpd in mgmt vrf
-  service:
-    name: snmpd@mgmt
+- name: Restart snmpd
+  systemd:
     state: restarted
     enabled: true
-  changed_when: false
+    name: snmpd
