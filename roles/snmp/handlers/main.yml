@@ -1,5 +1,6 @@
 ---
 - name: Stop snmpd
+  systemd:
     state: stopped
     name: snmpd
     enabled: true
