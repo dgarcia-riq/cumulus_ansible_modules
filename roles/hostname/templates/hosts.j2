@@ -8,5 +8,5 @@ ff02::2     ip6-allrouters
 {% if spine_enabled is defined %}
 {{ coresw_ipv4_unicast_network }} {{ hostname|default( inventory_hostname ) }} {{ hostname|default( inventory_hostname ) }}.{{ ansible_dns.domain }}
 {% else %}
-{{ ansible_lo_ipv4.address }} {{ hostname|default( inventory_hostname ) }} {{ hostname|default( inventory_hostname ) }}.{{ ansible_dns.domain }}
+{{ ansible_lo.ipv4_secondaries }} {{ hostname|default( inventory_hostname ) }} {{ hostname|default( inventory_hostname ) }}.{{ ansible_dns.domain }}
 {% endif %}
